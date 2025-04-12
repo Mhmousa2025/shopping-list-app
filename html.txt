@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🛍️ 2025 Shopping List</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🛒 My Shopping List</h1>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button type="button" onclick="showTab('new')">🆕 New List</button>
+      <button type="button" onclick="showTab('history')">📜 Previous Lists</button>
+    </div>
+
+    <!-- New List Tab -->
+    <div id="tab-new" class="tab">
+      <!-- Market Input -->
+      <form id="market-form">
+        <input id="market-input" placeholder="Market name..." />
+        <button type="submit">🏪 Set Market</button>
+      </form>
+
+      <p id="current-market" style="font-weight: bold; margin: 10px 0;">
+        Market: {% if market_name %} {{ market_name }} {% else %} Not set {% endif %}
+      </p>
+
+      <!-- Add Item Form -->
+      <form id="add-form">
+        <input id="item-input" placeholder="Item name..." required />
+        <input id="price-input" placeholder="Price (optional)" />
+        <button type="submit">➕ Add</button>
+      </form>
+
+      <!-- Shopping List -->
+      <ul id="shopping-list">
+        {% for item in items %}
+        <li data-index="{{ loop.index0 }}" class="{{ 'done' if item.done else '' }}">
+          <span class="item-display">
+            <strong>{{ item.item_name }}</strong><br />
+            <small>💰 {{ item.price or 'N/A' }}</small>
+          </span>
+          <input class="edit-name" style="display:none;" value="{{ item.item_name }}" />
+          <input class="edit-price" style="display:none;" value="{{ item.price }}" />
+          <div class="actions">
+            <button class="toggle-btn">✅</button>
+            <button class="edit-btn">✏️</button>
+            <button class="save-btn" style="display:none;">💾</button>
+            <button class="delete-btn">🗑️</button>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <!-- Save List Button -->
+      <button id="save-btn">💾 Save List</button>
+    </div>
+
+    <!-- Previous Lists Tab -->
+    <div id="tab-history" class="tab" style="display: none;">
+      <ul id="previous-lists">
+        {% for past in history %}
+          {% set outer_index = loop.index0 %}
+          <li>
+            <strong>List #{{ loop.index }} – 🏪 {{ past_market_names[outer_index] or 'Unknown Market' }}</strong>
+            <button onclick="deleteList({{ outer_index }})">🗑️ Delete</button>
+            <ul>
+              {% for item in past %}
+              <li>
+                ✅ <span class="past-name">{{ item.item_name }}</span> – 💰 <span class="past-price">{{ item.price or 'N/A' }}</span>
+                <input class="edit-past-name" style="display:none;" value="{{ item.item_name }}">
+                <input class="edit-past-price" style="display:none;" value="{{ item.price }}">
+                <button onclick="editPastItem(this, {{ loop.index0 }}, {{ outer_index }})">✏️</button>
+                <button class="save-past-btn" style="display:none;" onclick="savePastItem(this, {{ loop.index0 }}, {{ outer_index }})">💾</button>
+              </li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
